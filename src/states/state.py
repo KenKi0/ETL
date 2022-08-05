@@ -1,11 +1,13 @@
 from typing import Any, Protocol
 
+from src.states.state_storage import Storage
 
-class Storage(Protocol):
-    def save_state(self, state: dict) -> None:
+
+class BaseState(Protocol):
+    def set_state(self, key: str, value: Any) -> None:
         ...
 
-    def retrieve_state(self) -> dict:
+    def get_state(self, key: str) -> Any:
         ...
 
 

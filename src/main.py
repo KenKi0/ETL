@@ -1,15 +1,17 @@
 import argparse
 import logging.config
+from time import sleep
 
 import psycopg2
-from config import settings
-from elasticsearch import Elasticsearch
-from extract import PartName, PostgresExtracting
-from load import ElasticLoader
 from psycopg2.extras import DictCursor
-from state import State
-from state_storage import JsonFileStorage
-from transform import ElasticTransformer
+from elasticsearch import Elasticsearch
+
+from config import settings
+from src.etl.extract import PartName, PostgresExtracting
+from src.etl.load import ElasticLoader
+from src.states.state import State
+from src.states.state_storage import JsonFileStorage
+from src.etl.transform import ElasticTransformer
 from utils import Backoff, db_conn
 
 logging.config.dictConfig(settings.LOG_CONFIG)
@@ -21,7 +23,7 @@ def start_etl_process(
     parts_to_extract: list[PartName],
     batch_size: int,
 ) -> None:
-    state = State(JsonFileStorage('./state.json'))
+    state = State(JsonFileStorage('./data/state.json'))
 
     with db_conn(psycopg2.connect(**settings.postgres.dsl, cursor_factory=DictCursor)) as conn:
         extract = PostgresExtracting(conn, state, settings.DEFAULT_PROCESS_TIME, parts_to_extract, batch_size)
@@ -48,6 +50,7 @@ if __name__ == '__main__':
         default=False,
     )
     parser.add_argument('--batch-size', type=int, help='Count loaded data for one iteration of ETL', default=1000)
+    parser.add_argument('--freq', type=int, help='How often should the process be performed in minutes', default=10)
     args = parser.parse_args()
 
     if args.init:
@@ -55,4 +58,6 @@ if __name__ == '__main__':
     else:
         parts = [PartName.films, PartName.persons, PartName.genres]
 
-    start_etl_process(parts, args.batch_size)
+    while True:
+        start_etl_process(parts, args.batch_size)
+        sleep(args.freq * 60)

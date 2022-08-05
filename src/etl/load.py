@@ -1,16 +1,11 @@
 """ Load parts logic"""
 import json
 from pathlib import Path
-from typing import Protocol
 
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
-from utils import TransformedData
 
-
-class Transform(Protocol):
-    def transform(self) -> TransformedData:
-        ...
+from src.etl.transform import Transform
 
 
 class ElasticLoader:

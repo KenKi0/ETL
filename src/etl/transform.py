@@ -4,14 +4,15 @@ import logging
 from typing import Iterator, Protocol
 
 import scheme
-from config import settings
-from utils import DatabaseData, TransformedData
+from src.config import settings
+from src.etl.extract import Extracting
+from src.utils import TransformedData
 
 logger = logging.getLogger(__name__)
 
 
-class Extracting(Protocol):
-    def extract(self) -> DatabaseData:
+class Transform(Protocol):
+    def transform(self) -> TransformedData:
         ...
 
 

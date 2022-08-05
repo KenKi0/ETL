@@ -1,5 +1,13 @@
 import json
-from typing import Optional
+from typing import Optional, Protocol
+
+
+class Storage(Protocol):
+    def save_state(self, state: dict) -> None:
+        ...
+
+    def retrieve_state(self) -> dict:
+        ...
 
 
 class FilePathNotSpecifiedError(Exception):

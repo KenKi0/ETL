@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+
+  etl:
+    build: .
+    volumes:
+      - etl_data:/src/data
+    env_file:
+      - .env
+    depends_on:
+      - database
+      - elastic
+    restart: always

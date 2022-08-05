@@ -2,14 +2,21 @@
 import datetime
 import logging
 from enum import Enum
-from typing import Any, Iterator, Protocol
+from typing import Iterator, Protocol
 
-import raw_sql
+from src import raw_sql
 from psycopg2 import extensions as pg_ext
 from psycopg2.extras import DictRow
-from utils import DatabaseData
+
+from src.states.state import BaseState
+from src.utils import DatabaseData
 
 logger = logging.getLogger(__name__)
+
+
+class Extracting(Protocol):
+    def extract(self) -> DatabaseData:
+        ...
 
 
 class PartName(Enum):
@@ -18,19 +25,11 @@ class PartName(Enum):
     genres: str = 'genres'
 
 
-class State(Protocol):
-    def set_state(self, key: str, value: Any) -> None:
-        ...
-
-    def get_state(self, key: str) -> Any:
-        ...
-
-
 class PostgresExtracting:
     def __init__(
         self,
         conn: pg_ext.connection,
-        state: State,
+        state: BaseState,
         default_process_time: datetime.datetime,
         extract_parts: list[PartName],
         extract_size: int,
