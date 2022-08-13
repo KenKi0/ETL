@@ -1,0 +1,52 @@
+[tool.poetry]
+name = "new_admin_panel_sprint_3"
+version = "0.1.0"
+description = ""
+authors = ["kenki <ilsafganiev2222@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+psycopg2 = "^2.9.3"
+pydantic = {extras = ["dotenv"], version = "^1.9.1"}
+elasticsearch = "7.17.4"
+orjson = "^3.7.8"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^4.0.1"
+flake8-bugbear = "^22.6.22"
+flake8-commas = "^2.1.0"
+flake8-comprehensions = "^3.10.0"
+flake8-eradicate = "^1.2.1"
+flake8-pie = "^0.15.0"
+flake8-print = "^5.0.0"
+flake8-quotes = "^3.3.1"
+flake8-simplify = "^0.19.2"
+flake8-variables-names = "^0.0.5"
+dlint = "^0.12.0"
+black = "^22.6.0"
+isort = "^5.10.1"
+
+[tool.black]
+line-length = 120
+target-version = ["py38"]
+include = '\.pyi?$'
+skip-string-normalization = true
+exclude = '''
+(
+  /(
+      \.venv
+    | \.git
+    | \.env
+    | \raw_sql.py
+  )/
+)
+'''
+
+[tool.isort]
+multi_line_output = 3
+line_length = 120
+include_trailing_comma = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
