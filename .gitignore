@@ -1,5 +1,0 @@
-*.env
-.venv
-.idea
-__pycache__
-state.json
