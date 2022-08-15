@@ -59,7 +59,7 @@ if __name__ == '__main__':
     if args.init:
         parts = [PartName.films]
     else:
-        parts = [PartName.persons]
+        parts = [PartName.films, PartName.films_persons, PartName.films_genres, PartName.persons]
 
     while True:
         start_etl_process(parts, args.ex_batch_size, args.ld_batch_size)
