@@ -2,6 +2,13 @@
 
 # Можно ли оптимизировать запросы?
 # Например как то объеденить запросы person_film_id и person_films
+import datetime
+
+import psycopg2
+from psycopg2.extras import DictCursor
+
+from config import settings
+from utils import db_conn
 
 film = """
 SELECT
@@ -11,7 +18,7 @@ SELECT
    fw.rating as imdb_rating,
    fw.created_at,
    fw.updated_at,
-   COALESCE(ARRAY_AGG(DISTINCT p.full_name) 
+   COALESCE(ARRAY_AGG(DISTINCT jsonb_build_object('id', p.id, 'name', p.full_name)) 
    FILTER (WHERE pfw.role = 'director' AND p.id is not null), '{}') AS director,
    ARRAY_AGG(DISTINCT jsonb_build_object('id', p.id, 'name', p.full_name)) 
    FILTER (WHERE pfw.role = 'actor' AND p.id is not null) AS actors,
@@ -37,6 +44,19 @@ person_id = """
 SELECT id, updated_at
 FROM content.person
 WHERE updated_at > %s
+ORDER BY updated_at;
+"""
+
+persons = """
+SELECT p.id, 
+       p.full_name,
+       p.updated_at,
+       ARRAY_AGG(DISTINCT pfw.role) as role,
+       ARRAY_AGG(DISTINCT pfw.film_work_id)::text[] as film_ids
+FROM content.person p
+LEFT JOIN content.person_film_work pfw ON pfw.person_id = p.id
+WHERE updated_at > %s
+GROUP BY p.id, role
 ORDER BY updated_at;
 """
 
@@ -99,3 +119,8 @@ WHERE fw.id IN %s
 GROUP BY fw.id
 ORDER BY fw.updated_at;
 """
+
+with db_conn(psycopg2.connect(**settings.postgres.dsl, cursor_factory=DictCursor)) as conn:
+    cur = conn.cursor()
+    cur.execute(persons, [datetime.datetime(2010, 1, 1)])
+    print(cur.fetchall())

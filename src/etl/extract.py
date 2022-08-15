@@ -4,12 +4,12 @@ import logging
 from enum import Enum
 from typing import Iterator, Protocol
 
-from src import raw_sql
 from psycopg2 import extensions as pg_ext
 from psycopg2.extras import DictRow
 
-from src.states.state import BaseState
-from src.utils import DatabaseData
+import raw_sql
+from states.state import BaseState
+from utils import DatabaseData
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +21,9 @@ class Extracting(Protocol):
 
 class PartName(Enum):
     films: str = 'films'
+    films_persons: str = 'films_persons'
+    films_genres: str = 'films_genres'
     persons: str = 'persons'
-    genres: str = 'genres'
 
 
 class PostgresExtracting:
@@ -64,7 +65,7 @@ class PostgresExtracting:
             return time
         return str(self.default_process_time)
 
-    def _extract_films(self) -> Iterator[list[DictRow]]:
+    def _extract_films(self) -> Iterator[dict]:
         """
         Generator to extract films data
         """
@@ -73,16 +74,16 @@ class PostgresExtracting:
         self.cur.execute(raw_sql.film, [last_extracted_time])
 
         while films := self.cur.fetchmany(self.extract_size):
-            yield films
+            yield from films
             self.state.set_state('films', str(films[-1].get('updated_at')))
 
         yield None
 
-    def _extract_persons(self) -> Iterator[list[DictRow]]:
+    def _extract_films_persons(self) -> Iterator[DictRow]:
         """
         Generator to extract persons data
         """
-        last_extracted_time = self._get_process_last_filed_time('persons')
+        last_extracted_time = self._get_process_last_filed_time('films_persons')
         self.cur.execute(raw_sql.person_id, [last_extracted_time])
         persons = self.cur.fetchall()
         persons_id = [person.get('id') for person in persons]
@@ -96,7 +97,7 @@ class PostgresExtracting:
                 films_ids = [film.get('id') for film in films]
                 self.cur.execute(raw_sql.person_films, [tuple(films_ids)])
 
-                yield self.cur.fetchall()
+                yield from self.cur.fetchall()
 
                 self.state.set_state('persons_film', str(films[-1].get('updated_at')))
 
@@ -104,11 +105,11 @@ class PostgresExtracting:
 
         yield None
 
-    def _extract_genres(self) -> Iterator[list[DictRow]]:
+    def _extract_films_genres(self) -> Iterator[DictRow]:
         """
         Generator to extract persons data
         """
-        last_extracted_time = self._get_process_last_filed_time('genres')
+        last_extracted_time = self._get_process_last_filed_time('films_genres')
         self.cur.execute(raw_sql.genre_id, [last_extracted_time])
         genres = self.cur.fetchall()
         genres_id = [genre.get('id') for genre in genres]
@@ -122,10 +123,22 @@ class PostgresExtracting:
                 films_ids = [film.get('id') for film in films]
                 self.cur.execute(raw_sql.genre_films, [tuple(films_ids)])
 
-                yield self.cur.fetchall()
+                yield from self.cur.fetchall()
 
                 self.state.set_state('genres_film', str(films[-1].get('updated_at')))
 
             self.state.set_state('genres', str(genres[-1].get('updated_at')))
+
+        yield None
+
+    def _extract_persons(self) -> Iterator[DictRow]:
+        last_extracted_time = self._get_process_last_filed_time('persons')
+        self.cur.execute(raw_sql.persons, [last_extracted_time])
+
+        while persons := self.cur.fetchmany(self.extract_size):
+
+            yield from persons
+
+            self.state.set_state('persons', str(persons[-1].get('updated_at')))
 
         yield None

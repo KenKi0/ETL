@@ -17,7 +17,9 @@ class BaseScheme(BaseModel):
 
 class Person(BaseScheme):
     id: uuid.UUID  # noqa: VNE003
-    name: str
+    full_name: str
+    role: list[str]
+    film_ids: list[uuid.UUID]
 
 
 class FilmScheme(BaseScheme):
@@ -25,7 +27,7 @@ class FilmScheme(BaseScheme):
     title: str
     description: Optional[str]
     imdb_rating: Optional[float] = 0
-    director: Optional[list[str]]
+    director: Optional[list[dict]]
     actors: Optional[list[dict]] = []
     writers: Optional[list[dict]]
     actors_names: Optional[list[str]]
@@ -35,7 +37,7 @@ class FilmScheme(BaseScheme):
 
 class PersonScheme(BaseScheme):
     film_id: uuid.UUID
-    director: Optional[list[str]]
+    director: Optional[list[dict]]
     actors: Optional[list[dict]]
     writers: Optional[list[dict]]
     actors_names: Optional[list[str]]
