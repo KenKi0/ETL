@@ -101,7 +101,7 @@ class PostgresExtracting:
 
                 self.state.set_state('persons_film', str(films[-1].get('updated_at')))
 
-            self.state.set_state('persons', str(persons[-1].get('updated_at')))
+            self.state.set_state('films_persons', str(persons[-1].get('updated_at')))
 
         yield None
 
@@ -127,7 +127,7 @@ class PostgresExtracting:
 
                 self.state.set_state('genres_film', str(films[-1].get('updated_at')))
 
-            self.state.set_state('genres', str(genres[-1].get('updated_at')))
+            self.state.set_state('films_genres', str(genres[-1].get('updated_at')))
 
         yield None
 

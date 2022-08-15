@@ -2,13 +2,6 @@
 
 # Можно ли оптимизировать запросы?
 # Например как то объеденить запросы person_film_id и person_films
-import datetime
-
-import psycopg2
-from psycopg2.extras import DictCursor
-
-from config import settings
-from utils import db_conn
 
 film = """
 SELECT
@@ -119,8 +112,3 @@ WHERE fw.id IN %s
 GROUP BY fw.id
 ORDER BY fw.updated_at;
 """
-
-with db_conn(psycopg2.connect(**settings.postgres.dsl, cursor_factory=DictCursor)) as conn:
-    cur = conn.cursor()
-    cur.execute(persons, [datetime.datetime(2010, 1, 1)])
-    print(cur.fetchall())
