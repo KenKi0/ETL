@@ -102,3 +102,21 @@ class ElasticTransformer:
             yield es_action
 
         yield None
+
+    def _transform_genres(self) -> Iterator[dict]:
+        """
+        Generator to transform genres data
+        """
+        genres_data = self.data['genres']
+        while genre := next(genres_data):
+            serialized_genre = scheme.Genre(**genre)
+            es_action = {
+                '_op_type': 'index',
+                '_index': settings.elastic.INDEX.get('genres'),
+                '_id': serialized_genre.id,
+                '_source': serialized_genre.dict(),
+            }
+
+            yield es_action
+
+        yield None
