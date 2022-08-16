@@ -40,13 +40,13 @@ class ElasticTransformer:
         films_data = self.data['films']
         while film := next(films_data):
             serialized_film = scheme.FilmScheme(**film)
-            es_actions = {
+            es_action = {
                 '_op_type': 'index',
                 '_index': settings.elastic.INDEX.get('films'),
                 '_id': serialized_film.id,
                 '_source': serialized_film.dict(),
             }
-            yield es_actions
+            yield es_action
 
         yield None
 
@@ -54,16 +54,16 @@ class ElasticTransformer:
         """
         Generator to transform film persons data
         """
-        persons_data = self.data['persons']
+        persons_data = self.data['films_persons']
         while person := next(persons_data):
             serialized_person = scheme.PersonScheme(**person)
-            es_actions = {
+            es_action = {
                 '_op_type': 'update',
                 '_index': settings.elastic.INDEX.get('films'),
                 '_id': serialized_person.film_id,
-                '_source': serialized_person.dict(),
+                'doc': serialized_person.dict(exclude={'film_id'}),
             }
-            yield es_actions
+            yield es_action
 
         yield None
 
@@ -71,14 +71,14 @@ class ElasticTransformer:
         """
         Generator to transform film genres data
         """
-        genres_data = self.data['genres']
+        genres_data = self.data['films_genres']
         while genre := next(genres_data):
             serialized_genre = scheme.GenreScheme(**genre)
             es_action = {
                 '_op_type': 'update',
                 '_index': settings.elastic.INDEX.get('films'),
                 '_id': serialized_genre.film_id,
-                '_source': serialized_genre.dict(exclude={'film_id'}),
+                'doc': serialized_genre.dict(exclude={'film_id'}),
             }
 
             yield es_action
