@@ -105,7 +105,7 @@ SELECT fw.id, fw.updated_at
 FROM content.film_work fw
 LEFT JOIN content.genre_film_work gfw ON gfw.film_work_id = fw.id
 LEFT JOIN content.genre g ON g.id = gfw.genre_id
-WHERE gfw.id IN %s AND g.updated_at > fw.updated_at AND fw.updated_at > %s
+WHERE gfw.genre_id IN %s AND g.updated_at > fw.updated_at AND fw.updated_at > %s
 ORDER BY fw.updated_at;
 """
 
