@@ -65,8 +65,8 @@ ORDER BY fw.updated_at;
 person_films = """
 SELECT DISTINCT fw.id as film_id, 
        fw.updated_at,
-       ARRAY_AGG(DISTINCT p.full_name) 
-       FILTER (WHERE pfw.role = 'director' AND p.id is not null) AS director,
+       COALESCE(ARRAY_AGG(DISTINCT jsonb_build_object('id', p.id, 'name', p.full_name)) 
+       FILTER (WHERE pfw.role = 'director' AND p.id is not null), '{}') AS director,
        ARRAY_AGG(DISTINCT jsonb_build_object('id', p.id, 'name', p.full_name)) 
        FILTER (WHERE pfw.role = 'actor' AND p.id is not null) AS actors,
        ARRAY_AGG(DISTINCT jsonb_build_object('id', p.id, 'name', p.full_name)) 
