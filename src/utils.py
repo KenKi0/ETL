@@ -7,8 +7,8 @@ from typing import Callable, Iterator, Protocol, TypeAlias, TypeVar
 
 logger = logging.getLogger(__name__)
 
-DatabaseData: TypeAlias = dict[str, Iterator[list[dict]]]
-TransformedData: TypeAlias = dict[str, Iterator[list[dict]]]
+DatabaseData: TypeAlias = dict[str, Iterator[dict]]
+TransformedData: TypeAlias = dict[str, Iterator[dict]]
 
 
 class Connection(Protocol):
@@ -18,26 +18,28 @@ class Connection(Protocol):
 
 T = TypeVar('T', Connection, Connection)
 
+DEFAULT_DELAY = 1
+
 
 @contextmanager
 def db_conn(connection: T) -> T:
     """Context manager to close connection with database.
     @param connection: open connection with database
     """
-
-    yield connection
-
-    connection.close()
+    try:
+        yield connection
+    finally:
+        connection.close()
 
 
 def default_backoff_gen(start_delay: int, delay_limit: int):
     """
-    Default generator with increase delay logic
+    Default generator with increase delay logic as start_delay * 2
     :param start_delay: start delay time
     :param delay_limit: limit for delay time
     """
     if start_delay == 0:
-        start_delay = 1
+        start_delay = DEFAULT_DELAY
     while True:
         yield start_delay
         if start_delay < delay_limit:
@@ -79,9 +81,9 @@ class Backoff:
                     try:
                         return func(*args, **kwargs)
                     except self.exception as e:
-                        message = 'Exception {} caught.\n\nRetry attempt №{}.'.format(str(e), self.tries)
+                        message = 'Exception caught.\n\nRetry attempt №{}.'.format(self.tries)
 
-                        self.logger.log(self.log_level, message)
+                        self.logger.log(self.log_level, message, exc_info=e)
 
                         time.sleep(self.delay)
                         self.delay = next(backoff_gen)

@@ -63,8 +63,11 @@ class PostgresSettings(BaseConfig):
 class ElasticSettings(BaseConfig):
     HOST: str
     PORT: str = '9200'
-    INDEX: str = 'movies'
-    INDEX_FILE: Path = Path(Path(__file__).parent, 'index_schema.json')
+    INDEX: dict = {'films': 'movies', 'persons': 'persons'}
+    INDEX_FILES: dict[str, Path] = {
+        'films': Path(Path(__file__).parent, 'index_scheme/films_schema.json'),
+        'persons': Path(Path(__file__).parent, 'index_scheme/persons_schema.json'),
+    }
 
     class Config:
         env_prefix = 'ES_'

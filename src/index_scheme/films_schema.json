@@ -65,8 +65,17 @@
         "analyzer": "ru_en"
       },
       "director": {
-        "type": "text",
-        "analyzer": "ru_en"
+        "type": "nested",
+        "dynamic": "strict",
+        "properties": {
+          "id": {
+            "type": "keyword"
+          },
+          "name": {
+            "type": "text",
+            "analyzer": "ru_en"
+          }
+        }
       },
       "actors_names": {
         "type": "text",

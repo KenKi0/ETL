@@ -1,6 +1,6 @@
 from typing import Any, Protocol
 
-from src.states.state_storage import Storage
+from states.state_storage import Storage
 
 
 class BaseState(Protocol):
