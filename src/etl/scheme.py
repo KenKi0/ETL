@@ -32,7 +32,7 @@ class FilmScheme(BaseScheme):
     writers: Optional[list[dict]]
     actors_names: Optional[list[str]]
     writers_names: Optional[list[str]]
-    genre: Optional[list[str]]
+    genre: Optional[list[dict]]
 
 
 class PersonScheme(BaseScheme):
@@ -46,4 +46,4 @@ class PersonScheme(BaseScheme):
 
 class GenreScheme(BaseScheme):
     film_id: uuid.UUID
-    genre: Optional[list[str]]
+    genre: Optional[list[dict]]
