@@ -21,7 +21,7 @@ SELECT
    FILTER (WHERE pfw.role = 'actor' AND p.id is not null) AS actors_names,
    ARRAY_AGG(DISTINCT p.full_name) 
    FILTER (WHERE pfw.role = 'writer' AND p.id is not null) AS writers_names,
-   ARRAY_AGG(DISTINCT g.name)
+   ARRAY_AGG(DISTINCT jsonb_build_object('id', g.id, 'name', g.name))
    FILTER (WHERE g.id is not null) as genre
 FROM content.film_work fw
 LEFT JOIN content.person_film_work pfw ON pfw.film_work_id = fw.id
@@ -113,7 +113,7 @@ ORDER BY fw.updated_at;
 genre_films = """
 SELECT DISTINCT fw.id as film_id, 
        fw.updated_at,
-       ARRAY_AGG(DISTINCT g.name)
+       ARRAY_AGG(DISTINCT jsonb_build_object('id', g.id, 'name', g.name))
        FILTER (WHERE g.id is not null) as genre
 FROM content.film_work fw
 LEFT JOIN content.genre_film_work gfw ON gfw.film_work_id = fw.id
