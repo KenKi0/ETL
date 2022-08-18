@@ -24,6 +24,7 @@ class PartName(Enum):
     films_persons: str = 'films_persons'
     films_genres: str = 'films_genres'
     persons: str = 'persons'
+    genres: str = 'genres'
 
 
 class PostgresExtracting:
@@ -140,5 +141,17 @@ class PostgresExtracting:
             yield from persons
 
             self.state.set_state('persons', str(persons[-1].get('updated_at')))
+
+        yield None
+
+    def _extract_genres(self) -> Iterator[DictRow]:
+        last_extracted_time = self._get_process_last_filed_time('genres')
+        self.cur.execute(raw_sql.genres, [last_extracted_time])
+
+        while genres := self.cur.fetchmany(self.extract_size):
+
+            yield from genres
+
+            self.state.set_state('genres', str(genres[-1].get('updated_at')))
 
         yield None

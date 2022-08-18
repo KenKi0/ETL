@@ -22,6 +22,12 @@ class Person(BaseScheme):
     film_ids: list[uuid.UUID]
 
 
+class Genre(BaseScheme):
+    id: uuid.UUID  # noqa: VNE003
+    name: str
+    description: Optional[str]
+
+
 class FilmScheme(BaseScheme):
     id: uuid.UUID  # noqa: VNE003
     title: str

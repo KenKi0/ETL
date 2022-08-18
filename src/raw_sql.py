@@ -90,6 +90,16 @@ WHERE updated_at > %s
 ORDER BY updated_at;
 """
 
+genres = """
+SELECT id,
+       name,
+       description,
+       updated_at
+FROM content.genre
+WHERE updated_at > %s
+ORDER BY updated_at;
+"""
+
 genre_film_id = """
 SELECT fw.id, fw.updated_at
 FROM content.film_work fw
