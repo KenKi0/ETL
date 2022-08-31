@@ -25,6 +25,7 @@ class ElasticLoader:
         self.batch_size = batch_size
         self.data = self.transform.transform()
         self.index_exist()
+        self.is_loaded = False
 
     def index_exist(self) -> None:
         """
@@ -50,6 +51,7 @@ class ElasticLoader:
                 yield chunk
                 chunk = []
         if chunk:
+            self.is_loaded = True
             yield chunk
         yield None
 

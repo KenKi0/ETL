@@ -1,8 +1,11 @@
 import argparse
+import datetime
 import logging.config
 from time import sleep
 
 import psycopg2
+import jwt
+import requests
 from elasticsearch import Elasticsearch
 from psycopg2.extras import DictCursor
 
@@ -20,9 +23,9 @@ logger = logging.getLogger(__name__)
 
 @Backoff()
 def start_etl_process(
-    parts_to_extract: list[PartName],
-    pg_batch_size: int,
-    es_batch_size: int,
+        parts_to_extract: list[PartName],
+        pg_batch_size: int,
+        es_batch_size: int,
 ) -> None:
     state = State(JsonFileStorage('./src/data/state.json'))
 
@@ -40,6 +43,17 @@ def start_etl_process(
         )
 
         loader.load()
+
+        if loader.is_loaded:
+            token = jwt.encode({'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5),
+                                'iat': datetime.datetime.utcnow()},
+                               settings.SECRET,
+                               algorithm="HS256")
+            url = settings.FAST_APU_URL + '/api/v1/services/flush-cache'
+            response = requests.post(url=url,
+                                     headers={'Authorization': f'Bearer {token}'})
+            if response.status_code != 200:
+                logger.warning('Request for url %s, return status_code: %s', url, response.status_code)
 
 
 if __name__ == '__main__':

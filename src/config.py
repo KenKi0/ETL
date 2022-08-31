@@ -81,9 +81,11 @@ class ElasticSettings(BaseConfig):
 class ProjectSettings(BaseConfig):
     DEFAULT_PROCESS_TIME: datetime.datetime = datetime.datetime(2010, 1, 1)
     LOG_CONFIG: dict = LOGGING_CONFIG
+    SECRET: str = '245585dbb5cbe2f151742298d61d364880575bff0bdcbf4ae383f0180e7e47dd'
 
     postgres: PostgresSettings = PostgresSettings()
     elastic: ElasticSettings = ElasticSettings()
+    FAST_APU_URL: str = 'http://fastapi:8000'
 
 
 settings = ProjectSettings()
