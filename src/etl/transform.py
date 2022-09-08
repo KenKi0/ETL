@@ -42,11 +42,6 @@ class ElasticTransformer:
         """
         films_data = self.data['films']
         while film := next(films_data):
-            if film_date := film.get('creation_date'):
-                is_for_only_sub = datetime.datetime.utcnow() - film_date <= datetime.timedelta(days=3*DAYS_IN_YEAR)
-                film['only_sub'] = is_for_only_sub
-            else:
-                film['only_sub'] = False
             serialized_film = scheme.FilmScheme(**film)
             es_action = {
                 '_op_type': 'index',
