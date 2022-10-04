@@ -108,6 +108,9 @@
           }
         }
       },
+      "only_sub": {
+        "type": "boolean"
+      },
       "writers": {
         "type": "nested",
         "dynamic": "strict",

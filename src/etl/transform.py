@@ -1,4 +1,5 @@
 """ Transform parts logic"""
+import datetime
 import logging
 from typing import Iterator, Protocol
 
@@ -8,6 +9,8 @@ from etl.extract import Extracting
 from utils import TransformedData
 
 logger = logging.getLogger(__name__)
+
+DAYS_IN_YEAR = 365
 
 
 class Transform(Protocol):

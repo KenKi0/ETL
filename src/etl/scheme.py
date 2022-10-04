@@ -39,13 +39,13 @@ class FilmScheme(BaseScheme):
     actors_names: Optional[list[str]]
     writers_names: Optional[list[str]]
     genre: Optional[list[dict]]
+    only_sub: Optional[bool]
 
     @validator('imdb_rating')
     def rating_isnt_none(cls, v):
         if v is None:
             v = 0
         return v
-
 
 
 class PersonScheme(BaseScheme):
